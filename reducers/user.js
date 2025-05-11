@@ -14,6 +14,7 @@ export const userSlice = createSlice({
         },
         addFavoriteCity: (state, action) => {
             state.cities.push(action.payload);
+            console.log("reducer => ", state.cities)
         },
         deleteCity: (state, action) => {
             state.cities = state.cities.filter(element => element.city !== action.payload);

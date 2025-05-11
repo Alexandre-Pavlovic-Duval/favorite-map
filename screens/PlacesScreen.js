@@ -4,13 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { addFavoriteCity, deleteCity } from '../reducers/user';
 
-
-const placesData = [
-    { name: 'Paris', latitude: 48.859, longitude: 2.347 },
-    { name: 'Lyon', latitude: 45.758, longitude: 4.835 },
-    { name: 'Marseille', latitude: 43.282, longitude: 5.405 },
-];
-
 export default function PlacesScreen({}) {
     const dispatch = useDispatch();
     const username = useSelector((state) => state.user.username);
@@ -38,6 +31,9 @@ export default function PlacesScreen({}) {
             longitude: lon,
             latitude: lat
         }));
+
+        // Reset the input
+        setNewCity("");
     };
 
     const trashBtnToDelete = (cityToDelete) => {
@@ -70,7 +66,7 @@ export default function PlacesScreen({}) {
             </View>
             <View style={styles.containerAdd}>
                 <View style={styles.favoriteCitiesAdd}>
-                    <TextInput style={styles.inputedTxt} placeholder="New city" onChangeText={value => setNewCity(value)}/>
+                    <TextInput style={styles.inputedTxt} placeholder="New city" onChangeText={value => setNewCity(value)} value={newCity} clearButtonMode="always" />
                     <TouchableOpacity style={styles.btnAdd} onPress={() => addCity()}><Text style={styles.btnTxt}>Add</Text></TouchableOpacity>
                 </View>
             </View>
