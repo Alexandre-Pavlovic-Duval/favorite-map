@@ -1,25 +1,38 @@
-import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { addUserName } from '../reducers/user'
+import { useState } from 'react';
 
 export default function HomeScreen({ navigation }) {
+    const dispatch = useDispatch();
+    const [ username, setUsername ] = useState("");
+
+    const handlePress = () =>{
+        dispatch(addUserName(username))
+        navigation.navigate('TabNavigator', {screen: 'Map'})
+    };
+
  return (
-   <View style={styles.mainDiv}>
-    <View style={styles.topDiv}>
-        <Image style={styles.homeImg} source={require('../assets/home-image.jpg')}/>
-    </View>
-    <View style={styles.bottomDiv}>
-        <View style={styles.titleContainer}>
-            <Text style={styles.title}>Welcome to Locapic</Text>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <View style={styles.mainDiv}>
+            <View style={styles.topDiv}>
+                <Image style={styles.homeImg} source={require('../assets/home-image.jpg')}/>
+            </View>
+            <View style={styles.bottomDiv}>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Welcome to Locapic</Text>
+                </View>
+                <View style={styles.inputTextContainer}>
+                    <TextInput style={styles.inputText} placeholder="Nickname" onChangeText={(value) => setUsername(value)}/>
+                </View>
+                <View style={styles.mapBtnContainer}>
+                    <TouchableOpacity style={styles.mapBtn} onPress={() => handlePress()}>
+                        <Text style={styles.mapBtnText} >Go to map</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         </View>
-        <View style={styles.inputTextContainer}>
-            <TextInput style={styles.inputText} placeholder="Nickname" />
-        </View>
-        <View style={styles.mapBtnContainer}>
-            <TouchableOpacity style={styles.mapBtn} onPress={() => navigation.navigate('TabNavigator', {screen: 'Map'})}>
-                <Text style={styles.mapBtnText} >Go to map</Text>
-            </TouchableOpacity>
-        </View>
-    </View>
-   </View>
+    </KeyboardAvoidingView>
  );
 }
 

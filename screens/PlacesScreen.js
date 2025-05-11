@@ -1,5 +1,9 @@
 import { StyleSheet, Text ,TextInput, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { addFavoriteCity, deleteCity } from '../reducers/user';
+
 
 const placesData = [
     { name: 'Paris', latitude: 48.859, longitude: 2.347 },
@@ -8,19 +12,52 @@ const placesData = [
 ];
 
 export default function PlacesScreen({}) {
+    const dispatch = useDispatch();
+    const username = useSelector((state) => state.user.username);
+    const citiesData = useSelector((state) => state.user.cities);
 
-    const cities  = placesData.map((element, index) => {
+    const [ newCity, setNewCity ] = useState([]);
+    const [ longitude, setLongitude ] = useState("");
+    const [ latitude, setLatitute ] = useState("");
+
+    const addCity = async() => {
+        const response = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${newCity}`);
+        const data = await response.json();
+
+        // Data fetched
+        const lon = data.features[0].geometry.coordinates[0];
+        const lat = data.features[0].geometry.coordinates[1];
+
+
+        setLongitude(lon);
+        setLatitute(lat);
+
+
+        dispatch(addFavoriteCity({
+            city: newCity,
+            longitude: lon,
+            latitude: lat
+        }));
+    };
+
+    const trashBtnToDelete = (cityToDelete) => {
+        dispatch(deleteCity(cityToDelete));
+    };
+
+    const cities  = citiesData.map((element, index) => {
         return (
             <View key= {index} style={styles.cardContainer}>
                 <View style={styles.cityInfo}>
-                    <View style={styles.cityName}><Text style={styles.cityNameTxt}>{element.name}</Text></View>
+                    <View style={styles.cityName}>
+                        <Text style={styles.cityNameTxt}>{element.city}</Text>
+                    </View>
                     <View style={styles.coordinates}>
                         <View style={styles.cityLatitude}><Text>LAT: {element.latitude}</Text></View>
                         <View style={styles.cityLongitude}><Text>LON: {element.longitude}</Text></View>
                     </View>
                 </View>
                 <View style={styles.deleteBtn}>
-                    <FontAwesome style={styles.trash} name={"trash-o"} color={'rgba(236,110,92,255)'} />;
+                    <Text><FontAwesome style={styles.trash} name={"trash-o"} color={'rgba(236,110,92,255)'} onPress={() => trashBtnToDelete(element.city)}/></Text>
                     </View>
             </View>
         );
@@ -29,11 +66,12 @@ export default function PlacesScreen({}) {
     return(
         <View style={styles.mainDiv}>
             <View style={styles.title}>
-                <Text style={styles.txtPlaces}><Text>'s favorite places</Text></Text></View>
+                <Text style={styles.txtPlaces}>{username}'s favorite places</Text>
+            </View>
             <View style={styles.containerAdd}>
                 <View style={styles.favoriteCitiesAdd}>
-                    <TextInput style={styles.inputedTxt} placeholder="New city" />
-                    <TouchableOpacity style={styles.btnAdd}><Text style={styles.btnTxt}>Add</Text></TouchableOpacity>
+                    <TextInput style={styles.inputedTxt} placeholder="New city" onChangeText={value => setNewCity(value)}/>
+                    <TouchableOpacity style={styles.btnAdd} onPress={() => addCity()}><Text style={styles.btnTxt}>Add</Text></TouchableOpacity>
                 </View>
             </View>
             <View style={styles.citiesContainer}>
